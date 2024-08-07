@@ -1,6 +1,6 @@
 ---
-title: "Interacción entre variables"
-subtitle: "Relaciónes condicionales"
+title: "Modelos Multinivel"
+subtitle: "Modelos mixtos y de partición de varianza"
 toc: true
 toc-expand: true
 toc-title: Content
