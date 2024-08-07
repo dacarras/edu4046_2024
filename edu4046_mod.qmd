@@ -3,7 +3,7 @@ title: "Interacción entre variables"
 subtitle: "Relaciónes condicionales"
 toc: true
 toc-expand: true
-toc-title: Content
+toc-title: Contenido
 author:
   - name: https://dacarras.github.io/
 date-modified: last-modified
@@ -29,7 +29,50 @@ monofontoptions:
 ---
 
 
-# Gráfico
+# Idea general
+
+Los modelos de regresión los podemos pensar como modelos de medias condicionadas. 
+
+Supongamos que tenemos los puntajes de un test que expresa habilidad matemática (e.g., capacidad de resolución de problemas), y denominemos a este puntaje como $y_{i}$. Que un modelo de regresión sea pensado como un modelo de medias condicionadas, nos permite indicar que podemos expresar diferentes puntos de del puntaje total anterior, segun los valores de otras covariables (i.e., *condicional a...*). Por ejemplo, que contamos con la escolaridad de los padres de los estudiantes, para los cuales tenemos los puntajes de habilidad. Empleemos a la variable $x_{i}$ para alojar a los valores de escolaridad de los padres (e.g., 1 para educación terciaria, y 0 para grados educativos menores a la educación terciaria.).
+
+**Descriptivamente**, podemos calcular las medias de ambos grupos de estudiantes, y ademas, podríamos calcular la diferencia de medias entre ambos grupos, y con lo anterior tener una noción de si los estudiantes difieren en sus puntajes *condicional a* la escolaridad de sus padres.
+
+Ahora, podemos abordar la misma inquietud empleando un modelo de regresión:
+
+$$y_{i} = \beta_{0} + \beta_{1}x_{i} + \epsilon_{i}$$
+
+Donde,
+
+- $y_{i}$ = puntaje total de cada estudiante $_{i}$.
+
+- $x_{i}$ = escolaridad máxima de los padres de cada estudiante $_{i}$.
+
+Con los resultados de la regresión anterior podemos obtener las medias esperadas de cada grupo:
+
+- Media de estudiantes con padres de escolaridad menor a terciaria
+
+$\beta_{0} + \beta_{1}(x_{i} = 0)$
+
+- Media de estudiantes con padres de escolaridad terciaria
+
+$\beta_{0} + \beta_{1}(x_{i} = 1)$
+
+**¿Que pasaría sin incluimos una tercera variable?** Si tuvieramos la información de una tercera variable, dado que estamos pensando el modelo de regresión como una forma de expresar medias condicionadas, es que entonces podriamos tener otra diferencia adicional entre grupos. Pensemos en una tercera covariable, como la dependencia de la escuelas (e.g., Privadas y Públicas). Para efectos del ejemplo, pensemos que las escuelas privadas toman un valor uno, y las escuelas públicas toman un valor cero.
+
+$$y_{i} = \beta_{0} + \beta_{1}x_{i} + \beta_{2}w_{i} + \epsilon_{i}$$
+
+- $w_{i}$ = tipo de escuela a la que asisten a los estudiantes $_{i}$, donde 1 son escuelas privadas, y 0 son escuelas públicas.
+
+Con el modelo anterior, solo podemos representar (i.e., asumir) que las medias entre los grupos aumentan o disminuyen con respecto a al intercepto ( $\beta_{0}$ ), condicional a los valores de $x_{i}$ (i.e. la escolaridad máxima de los padres) y condicional a los valores de $w_{i}$ (i.e., la dependencia administrativa de la escuelas).
+
+Para poder representar que las medias anteriores son condicionales entre sí o que **interactúan**, necesitamos incluir un término adicional: el multiplo de las variables $x_{i}$ e $w_{i}$, es decir $x_{i}*w_{i}$. Este término nos permitirá obtener un coeficiente de regresión adicional, el cual nos permite saber si hay un "exceso" en las diferencias de medias que estamos obteniendo con los coeficientes anteriores. De esta forma, si incluimos a todos los términos:
+
+$$y_{i} = \beta_{0} + \beta_{1}x_{i} + \beta_{2}w_{i} + \beta_{3}(x_{i}*w_{i})+\epsilon_{i}$$
+
+
+La inquietud general que uno busca responder con el estudio de interacciones entre variables es si la relación entre variables que tenemos en la expresión anterior es equivalente, cuando consideramos la información de una **tercera variable**.
+
+
 
 
 # Ejemplo sustantivo
@@ -80,4 +123,410 @@ Diagrama de vías
 # Bibliografía anotada
 
 
+
+# Code exploratory
+
+```{r, echo = FALSE, eval = TRUE, include = FALSE}
+
+#---------------------------------------------------------------
+# exploratory
+#---------------------------------------------------------------
+
+#--------------------------------------
+# codebook
+#--------------------------------------
+
+library(dplyr)
+erce::erce_2019_qa6 %>%
+labelled::lookfor() %>%
+labelled::lookfor_to_long_format() %>%
+tibble::as_tibble() %>%
+knitr::kable()
+
+#--------------------------------------
+# selected variables
+#--------------------------------------
+library(dplyr)
+erce::erce_2019_qa6 %>%
+labelled::lookfor() %>%
+labelled::lookfor_to_long_format() %>%
+tibble::as_tibble() %>%
+dplyr::filter(variable %in% c('MAT_1','EDU', 'DEP')) %>%
+dplyr::select(pos, variable, label, levels, value_labels) %>%
+knitr::kable()
+
+#--------------------------------------
+# load data
+#--------------------------------------
+
+library(dplyr)
+data_a6 <- erce::erce_2019_qa6 %>%
+           erce::remove_labels()
+
+#--------------------------------------
+# countries with three and two systems
+#--------------------------------------
+
+data_a6 %>%
+dplyr::count(COUNTRY, DEP) %>%
+knitr::kable()
+
+#--------------------------------------
+# example with Colombia
+#--------------------------------------
+
+data_a6 %>%
+dplyr::filter(COUNTRY == 'COL') %>%
+mutate(y = MAT_1) %>%
+mutate(x = EDU) %>%
+mutate(w = case_when(
+DEP == 1 ~ 0, # public
+DEP == 2 ~ 1, # private
+DEP == 3 ~ 0  # other
+)) %>%
+lm(y ~ 1 + x*w, data = .) %>%
+summary()
+
+
+#--------------------------------------
+# number of observations
+#--------------------------------------
+
+data_a6 %>%
+dplyr::filter(COUNTRY == 'COL') %>%
+nrow()
+
+#--------------------------------------
+# number of observations
+#--------------------------------------
+
+data_model <- data_a6 %>%
+dplyr::filter(COUNTRY == 'COL') %>%
+mutate(y = MAT_1) %>%
+mutate(x = EDU) %>%
+mutate(w = case_when(
+DEP == 1 ~ 0, # public
+DEP == 2 ~ 1, # private
+DEP == 3 ~ 0  # other
+)) %>%
+mutate(xw = x*w)
+
+lavaan_model <- '
+y ~ b0*1
+y ~ b1*x
+y ~ b2*w
+y ~ b3*xw
+
+# expected means
+m0 := b0 + b1*0 + b2*0 + b3*(0*0)
+m1 := b0 + b1*0 + b2*1 + b3*(0*1)
+m2 := b0 + b1*1 + b2*0 + b3*(1*0)
+m3 := b0 + b1*1 + b2*1 + b3*(1*1)
+'
+
+
+# -----------------------------------------------
+# fit model
+# -----------------------------------------------
+
+m01 <- lavaan::sem(lavaan_model, 
+       mimic = 'MPLUS',
+       data = data_model)
+
+# -----------------------------------------------
+# display summary
+# -----------------------------------------------
+
+lavaan::summary(m01, 
+  fit.measures=TRUE,
+  standardized=TRUE,
+  rsquare=TRUE)
+
+
+```   
+# Simulations
+
+```{r, echo = FALSE, eval = TRUE, warning=FALSE}
+
+#---------------------------------------------------------------
+# exploratory
+#---------------------------------------------------------------
+
+
+#--------------------------------------
+# ideal effects
+#--------------------------------------
+
+b0 <- 700.000
+b1 <- 100.000
+b2 <- 100.000
+b3 <- 100.000
+
+
+#--------------------------------------
+# scenario 1: no differences on w
+#--------------------------------------
+
+set.seed(321)
+library(dplyr)
+library(simglm)
+
+sample_size <- 4500
+sim_arguments <- list(
+  formula = y ~ 1 + x + w + x*w,
+  fixed = list(
+               x = list(var_type = 'factor', levels = c(0, 1)),
+               w = list(var_type = 'factor', levels = c(0, 1))
+               ),
+  error = list(variance = 6350.643),
+  sample_size = sample_size,
+  reg_weights = c(
+    b0*1  , # b0
+    b1*1  , # b1
+    b2*0  , # b2
+    b3*0    # b3
+    )
+)
+
+data_1 <- simulate_fixed(data = NULL, sim_arguments) %>%
+simulate_error(sim_arguments) %>%
+generate_response(sim_arguments)
+
+#--------------------------------------
+# scenario 2: no interaction
+#--------------------------------------
+
+set.seed(321)
+library(dplyr)
+library(simglm)
+
+sample_size <- 4500
+sim_arguments <- list(
+  formula = y ~ 1 + x + w + x*w,
+  fixed = list(
+               x = list(var_type = 'factor', levels = c(0, 1)),
+               w = list(var_type = 'factor', levels = c(0, 1))
+               ),
+  error = list(variance = 6350.643),
+  sample_size = sample_size,
+  reg_weights = c(
+    b0*1  , # b0
+    b1*1  , # b1
+    b2*1  , # b2
+    b3*0    # b3
+    )
+)
+
+data_2 <- simulate_fixed(data = NULL, sim_arguments) %>%
+simulate_error(sim_arguments) %>%
+generate_response(sim_arguments)
+
+#--------------------------------------
+# scenario 3: negative interaction
+#--------------------------------------
+
+set.seed(321)
+library(dplyr)
+library(simglm)
+
+sample_size <- 4500
+sim_arguments <- list(
+  formula = y ~ 1 + x + w + x*w,
+  fixed = list(
+               x = list(var_type = 'factor', levels = c(0, 1)),
+               w = list(var_type = 'factor', levels = c(0, 1))
+               ),
+  error = list(variance = 6350.643),
+  sample_size = sample_size,
+  reg_weights = c(
+    b0*1  , # b0
+    b1*1  , # b1
+    b2*1  , # b2
+    b3*-1   # b3
+    )
+)
+
+data_3 <- simulate_fixed(data = NULL, sim_arguments) %>%
+simulate_error(sim_arguments) %>%
+generate_response(sim_arguments)
+
+#--------------------------------------
+# scenario 4: positive interaction
+#--------------------------------------
+
+set.seed(321)
+library(dplyr)
+library(simglm)
+
+sample_size <- 4500
+sim_arguments <- list(
+  formula = y ~ 1 + x + w + x*w,
+  fixed = list(
+               x = list(var_type = 'factor', levels = c(0, 1)),
+               w = list(var_type = 'factor', levels = c(0, 1))
+               ),
+  error = list(variance = 6350.643),
+  sample_size = sample_size,
+  reg_weights = c(
+    b0*1  , # b0
+    b1*1  , # b1
+    b2*1  , # b2
+    b3*1    # b3
+    )
+)
+
+data_4 <- simulate_fixed(data = NULL, sim_arguments) %>%
+simulate_error(sim_arguments) %>%
+generate_response(sim_arguments)
+
+#--------------------------------------
+# fit models
+#--------------------------------------
+
+# scenario 1: no effect for w
+model_1 <- data_1 %>%
+lm(y ~ 1 + x*w, data = .)
+
+# scenario 2: no interaction for w
+model_2 <- data_2 %>%
+lm(y ~ 1 + x*w, data = .)
+
+# scenario 3: negative interaction
+model_3 <- data_3 %>%
+lm(y ~ 1 + x*w, data = .)
+
+# scenario 4: positive interaction
+model_4 <- data_4 %>%
+lm(y ~ 1 + x*w, data = .)
+
+
+#--------------------------------------
+# plots
+#--------------------------------------
+
+library(ggplot2)
+library(hrbrthemes)
+plot_1 <- interactions::interact_plot(model_1, 
+pred = x, 
+modx = w,
+interval = TRUE,
+y.label = 'Matemáticas',
+x.label = 
+'Educación de los padres
+(No Terciaria = 0,Terciaria = 1)
+',
+modx.labels = c('Pública','Privada'),
+colors = c('black','red')
+) +
+scale_y_continuous(
+  breaks = seq(400, 1000, by = 100),
+  limits = c(400, 1000)
+) +
+theme_ipsum() +
+labs(
+title = 'Panel A',
+subtitle = 'Escenario 1: b1 = +, b2 = 0, b3 = 0'
+)
+
+plot_1
+
+
+library(ggplot2)
+library(hrbrthemes)
+plot_2 <- interactions::interact_plot(model_2, 
+pred = x, 
+modx = w,
+interval = TRUE,
+x.label = 
+'Educación de los padres
+(No Terciaria = 0,Terciaria = 1)
+',
+y.label = 'Matemáticas',
+modx.labels = c('Pública','Privada'),
+colors = c('black','red')
+) +
+scale_y_continuous(
+  breaks = seq(400, 1000, by = 100),
+  limits = c(400, 1000)
+) +
+theme_ipsum() +
+labs(
+title = 'Panel B',
+subtitle = 'Escenario 2: b1 = +, b2 = +, b3 = 0'
+)
+
+
+plot_2
+
+library(ggplot2)
+library(hrbrthemes)
+plot_3 <- interactions::interact_plot(model_3, 
+pred = x, 
+modx = w,
+interval = TRUE,
+x.label = 
+'Educación de los padres
+(No Terciaria = 0,Terciaria = 1)
+',
+y.label = 'Matemáticas',
+modx.labels = c('Pública','Privada'),
+colors = c('black','red')
+) +
+scale_y_continuous(
+  breaks = seq(400, 1000, by = 100),
+  limits = c(400, 1000)
+) +
+theme_ipsum() +
+labs(
+title = 'Panel C',
+subtitle = 'Escenario 3: b1 = +, b2 = +, b3 = -'
+)
+
+plot_3
+
+library(ggplot2)
+library(hrbrthemes)
+plot_4 <- interactions::interact_plot(model_4, 
+pred = x, 
+modx = w,
+interval = TRUE,
+x.label = 
+'Educación de los padres
+(No Terciaria = 0,Terciaria = 1)
+',
+y.label = 'Matemáticas',
+modx.labels = c('Pública','Privada'),
+colors = c('black','red')
+) +
+scale_y_continuous(
+  breaks = seq(400, 1000, by = 100),
+  limits = c(400, 1000)
+) +
+theme_ipsum() +
+labs(
+title = 'Panel D',
+subtitle = 'Escenario 4: b1 = +, b2 = +, b3 = +'
+)
+
+plot_4
+
+
+#--------------------------------------
+# plots
+#--------------------------------------
+
+
+library(cowplot)
+plot_grid(
+  plot_1, # no differences
+  plot_2, # no interaction
+  plot_3, # negative interaction
+  plot_4, # real
+  nrow = 2, 
+  ncol = 2
+)
+
+
+
+```
 
