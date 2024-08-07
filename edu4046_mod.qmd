@@ -10,18 +10,18 @@ date-modified: last-modified
 format:
   html:
     theme: journal
-    code-overflow: wrap
-    code-line-numbers: true
-    code-annotations: below
-    code-link: true
-    embed-resources: true
-    grid:
-      sidebar-width: 250px
-      body-width: 750px # 950px thinner, 1050px wider
-      margin-width: 400px
-      gutter-width: 1.5rem
-    header-includes: |
-      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+code-overflow: wrap
+code-line-numbers: true
+code-annotations: below
+code-link: true
+embed-resources: true
+grid:
+  sidebar-width: 250px
+  body-width: 750px # 950px thinner, 1050px wider
+  margin-width: 400px
+  gutter-width: 1.5rem
+header-includes: |
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
 mainfont: Noto Sans
 monofont: Source Code Pro
 monofontoptions: 
@@ -55,7 +55,7 @@ knitr::opts_chunk$set(echo = TRUE, fig.align="center")
 
 # load('rasch_example.RData')
 
-``` 
+```
 
 # Introdución
 
@@ -369,13 +369,13 @@ values = c(
 ```
 ::: {.callout-warning title="Advertencia"}
 
-- nota aclaratoria aqui de que hablamos de efectos en el sentido estructural, como RabeHesketh, y no como efecto causal.
+En este documento empleamos los términos **efecto** y **efectos principales** para referirnos a los parámetros del modelo, que esperamos genere los datos (i.e., *data generating mechanism*). En otras palabras, nos estamos refiriendo a un aspecto estructural de los modelos que se ajustan (ver Rabe-Hesketh & Skrondal, 2012, p56-59). Esta terminología, es similar en nombre al uso de la expresión **efecto** como **efecto causal** que se emplea en la literatura de inferencia causal. No obstante, si bien hay conincidencias de términos, ambas expresiones no significan lo mismo. En el presente documento emplearemos el **término efecto** solo para aludir a relaciones esperadas entre variables, las cuales estan expresadas en los modelos de regresión y no para aludir al efecto causal que se espera de una variable por sobre otra.
 
 :::
 
 En este tercer escenario las medias *se desplazan* respecto al punto de referencia inicial, el intercepto.  Este desplazamiento ocurre tanto condicional a los valores de $x_{i}$, como condicional a los valores de $w_{i}$. Los estudiantes hijos de padres sin educación terciara presentan medias menores, en contraste a sus pares que asisten a escuelas privadas. En este escenario, observamos diferencias similares, entre los estudiantes hijos de padres con educación terciara. Aquellos que asisten a escuelas privadas, presentan medias de mayor tamaño, en contraste a sus pares que asisten a escuelas públicas.
 
-Ahora, nos vamos a imginar un **cuarto escenario**, donde incluímos una interacción entre ambas variables: entre la escolaridad de los padres, y el tipo de escuela al que asisten los estudiantes.
+Ahora, nos vamos a imaginar un **cuarto escenario**, donde incluímos una interacción entre ambas variables: entre la escolaridad de los padres, y el tipo de escuela al que asisten los estudiantes.
 
 ```{r, echo = TRUE, eval = TRUE, warning=FALSE}
 #| code-fold: true
@@ -561,8 +561,8 @@ values = c(
 
 ::: {.callout-note title="Nota"}
 
-De los cinco escenarios revisados, solo dos de ellos incluyen un efecto de interacción, el escenario 4 y 5. En estos escenarios los la brecha o relación entre $y_{i}$ y $x_{i}$ varía segúm los valores de $w_{i}$. Mientras en el escenario 4 la brecha entre $y_{i}$ y $x_{i}$ se hace mas pequeña al aumentar los valores de $w_{i}$; en el escenario 5 la brecha entre $y_{i}$ y $x_{i}$ es de mayor tamaño al aumentar los valores de $w_{i}$ (de público $w_{i} = 0$ a privado $w_{i} = 1$).
-
+De los cinco escenarios revisados, solo dos de ellos incluyen un término de interacción, el escenario 4 y el escenario 5. En estos escenarios lla brecha o relación entre $y_{i}$ y $x_{i}$ varía según los valores de $w_{i}$. Mientras en el escenario 4 la brecha entre $y_{i}$ y $x_{i}$ se hace mas pequeña al aumentar los valores de $w_{i}$; en el escenario 5 la brecha entre $y_{i}$ y $x_{i}$ es de mayor tamaño al aumentar los valores de $w_{i}$ (de público $w_{i} = 0$ a privado $w_{i} = 1$).
+  
 :::
 
 
@@ -570,7 +570,7 @@ A continuación, vamos a representar de manera formal a los escenarios anteriore
 
 # Representación Formal
 
-Las diferencias de medias que ilustramos anteriormente, las podemos representar con un modelo de regresión. La ecuación general de regresión que nos permite representar a los escenarios anteriores toma la siguiente forma:
+Las diferencias de medias que ilustramos anteriormente las podemos obtener con un modelo de regresión. La siguente ecuación de regresión nos permite representar a los escenarios anteriores:
 
 $$y_{i} = \beta_{0} + \beta_{1}x_{i} + \beta_{2}w_{i} + \beta_{3}(x_{i}*w_{i}) + \epsilon_{i}$$
 
@@ -590,9 +590,19 @@ Donde,
 
 - $\beta_{3}$ = es el término de interacción para las variable $x_{i}$ e $w_{i}$. Este término de interacción es difícil de interpretar por si solo. Una heurística útil, es considerar su dirección (i.e. si es positivo o negativo), en relación a la dirección de los coeficientes anteriores. Si es positivo, y los términos anteriores son positivos también se espera que la brecha entre $y_{i}$ e $x_{i}$ aumente, condicional a los valores de $w_{i}$ (como en el escenario 5). En cambio si este término es negativo, y va en dirección contraria a la dirección de las covariables que lo producen, lo que se espera es que la brecha entre $y_{i}$ e $x_{i}$ disminuya, condicional a los valores de $w_{i}$.
 
-## Parámetros de los escenarios revisados
+- $\epsilon_{i}$ = son los residuos del modelo. Estos corresponden a las distancias entre los valores observados, respecto a la línea ideal que traza el modelo de regresión sobre los datos. Este termino tiene una media cero, una varianza libre, y posee una distribución normal en el modelo que genera los datos. Este último aspecto del modelo de regresión se expresa de la siguiente forma:
 
-Con el modelo anterior y definiendo a los términos  $\beta_{0}$, $\beta_{1}$, $\beta_{2}$ y $\beta_{3}$ generamos los datos de cada uno de los escenarios anteriores. Es decir, produjimos datos simulados para representar diferentes posibilidades de relaciones entre tres variables diferentes.
+
+$$\epsilon_i \sim \mathcal{N}(0, \sigma^2)$$
+
+
+## Parámetros definidos
+
+Empleando al modelo de regresión anterior generamos datos para cada uno de los escenarios posibles antes descritos. Definimos los valores de los términos $\beta_{0}$, $\beta_{1}$, $\beta_{2}$ y $\beta_{3}$, y $\epsilon_{i}$ para 5 escenarios diferentes. En base a esta definición generamos datos para 4500 observaciones, en una sola realización.
+
+Produjimos datos simulados para ilustrar diferentes posibilidades de resultados que podríamos tener con conjuntos de relaciones de tres variables en modelos de regresión.
+
+Los escenarios generados fueron los siguientes:
 
 **Escenario 1: sin diferencias**
 
@@ -614,12 +624,24 @@ $$y_{i} = 700 + 100*x_{i} + 100*w_{i} - 100*(x_{i}*w_{i}) + \epsilon_{i}$$
 
 $$y_{i} = 700 + 100*x_{i} + 100*w_{i} + 100*(x_{i}*w_{i}) + \epsilon_{i}$$
 
-## Representación gráfica de una interacción
+Para cada uno de los escenarios definimos que $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$, donde,
 
-Tradicionalmente la visualización de interacciones emplea graficos de *simple slopes* o de medias por grupos unidas por una linea. A continuación graficaremos de esta forma a los 5 escenarios que planteamos anteriormente.
+- $\sigma^2$ = 6350.643
+
+::: {.callout-note title="Nota"}
+
+Para poder generar datos simulados empleando a los parámetros anteriores `library(simglm)` (ver LeBau, 2024). Previo a la presentación de cada figura se encuentra el código empleado. Si se hace click sobre el término presentado en gris `code`, se puede acceder al código empleado.
+  
+:::
 
 
-Para el caso del escenario 1 el único parámetro informativo es el intercepto, porque este es un escenario en que las variables $x_{i}$ e $w_{i}$ no son informativas respecto a los valores de $y_{i}$.
+## Representación gráfica
+
+Tradicionalmente la visualización de interacciones emplea gráficos de _**simple slopes**_ (Bauer, 2005; Preacher et al., 2006). En el caso de las interacciones generadas con variables categóricas de dos valores, estos gráficos incluyen a las medias esperadas de cada grupo, y estas medias son unidas con una linea. La inclinación de estas estas rectas expresan a las pendientes de regresión esperadas.
+
+A continuación generamos gráficos para los 5 escenarios anteriores empleando este tipo de figuras.
+
+Para el caso del ** escenario 1 ** el único parámetro informativo es el intercepto, porque este es un escenario en que las variables $x_{i}$ e $w_{i}$ no son informativas respecto a los valores de $y_{i}$.
 
 ```{r, echo = TRUE, eval = TRUE, warning=FALSE}
 #| code-fold: true
@@ -668,12 +690,12 @@ plot_1
 
 ```
 
-En el escenario 2, solo incluimos un efecto principal relaciona a la variabe $x_{i}$. En este escenario podemos indicar que la brecha de puntajes de matemáticas producto de las diferencias de escolaridad de los padres, es generalizable a los estudiantes que asisten a ambos tipos de escuelas, tanto públicas como privadas.
+En el ** escenario 2 **, solo incluimos un efecto principal, la relación de la variable $x_{i}$ con $y_{i}$. En este escenario podemos indicar que la brecha de puntajes de matemáticas producto de las diferencias de escolaridad de los padres es generalizable a los estudiantes que asisten a ambos tipos de escuelas, tanto públicas como privadas.
 
 
 ```{r, echo = TRUE, eval = TRUE, warning=FALSE}
 #| code-fold: true
-#| fig-cap: "Escenario 1: figura sin efectos"
+#| fig-cap: "Escenario 2: efecto de x solamente"
 
 #---------------------------------------------------------------
 # simple slope
@@ -718,14 +740,16 @@ plot_2
 
 ```
 
-El escenario 3, consiste de un escenario en que solo observamos efectos principales sin interaccionees. Es de decir que, los valores de $y_{i}$ varían condicionales a los valores de $x_{i}$ y $w_{i}$, de forma aditiva, sin incluir interacciones entre ambos factores. En terminos sustantivos esto implica que los valores esperados de los puntajes de Matemáticas varían entre lso estudiantes segun la escolaridad de los padres, y según al tipo de escuela a la que asisten, sin que estas relaciones interactuen entre sí.
+El ** escenario 3 ** consiste de un escenario en que solo observamos efectos principales de los factores estudiados, sin interacción alguna. Es de decir que, los valores de $y_{i}$ varían condicionales a los valores de $x_{i}$ y $w_{i}$, de forma aditiva, sin incluir interacciones entre ambos factores.
 
-En este tipo de escenarios, los graficos de *simple slopes* presentan lineas rectas que son paralelas. Esta aspecto es una característica distintiva de la evaluacion de los efectos de interacción: solo cuando hay interacciones las rectas generadas por los graficos de simple slope se deben cruzar. En escenarios en que no hay interacciones, estos graficos deben desplegar rectas paralelas.
+En términos sustantivos lo anterior implica que los valores esperados de los puntajes de Matemáticas varían entre los estudiantes según la escolaridad de los padres, y según al tipo de escuela a la que asisten, sin que estas relaciones interactúen entre sí.
+
+En este tipo de escenarios los gráficos de *simple slopes* presentan lineas **rectas que son paralelas**. Lo anterior, es una característica distintiva de este tipo de gráficos cuando hay una ausencia de interacción entre variables. Complementariamente, solo cuando hay interacciones las rectas generadas por este tipo de gráficos se cruzan pueden cruzar.
 
 
 ```{r, echo = TRUE, eval = TRUE, warning=FALSE}
 #| code-fold: true
-#| fig-cap: "Escenario 1: figura sin efectos"
+#| fig-cap: "Escenario 3: efecto de x e w sin interacción"
 
 #---------------------------------------------------------------
 # simple slope
@@ -770,13 +794,16 @@ plot_3
 
 ```
 
-En el escenario 4, es el primer escenario donde en un sistema de 3 variables incluimos una interacción entre las covariables. En este caso, no podemos decir que la relación entre $y_{i}$ y $x_{i}$ es generalible a los diferentes valores observados de $w_{i}$. En términos sustantivos, los resultados implican que no hay brecha en los puntajes de matemáticas de los estudiantes condicionales a la escolaridad de los padres, para aquellos estudiantes que asisten a escuelas privadas. Sin embargo, si observamos una brecha entre los estudiantes hijos de padres con diferentes grados educativos. Aquellos estudiantes hijos de padres sin educación terciaria, presentan medias de cerca de 700 puntos, en contraste a sus pares hijos de padres con mayor escolaridad (educación terciaria), los cuales presentan medias de cerca de 800 puntos.
+En el ** escenario 4**, es el primer escenario donde en un sistema de 3 variables incluimos una interacción entre las covariables incluidas en el modelo. En este caso, no podemos decir que la relación entre $y_{i}$ y $x_{i}$ es generalizable a los diferentes valores observados de $w_{i}$.
 
-Como fuera mencionado anteriormente, solo en casos de interacción entre variables los gráficos de *simples slopes*, presentan rectas que no son paralelas y que potencionalmente se cruzan.
+En términos sustantivos, los resultados implican que no hay brecha en los puntajes de matemáticas de los estudiantes condicionales a la escolaridad de los padres, para aquellos estudiantes que asisten a escuelas privadas. Sin embargo, si observamos una brecha entre los estudiantes hijos de padres con diferentes grados educativos. Aquellos estudiantes hijos de padres sin educación terciaria, presentan medias de cerca de 700 puntos, en contraste a sus pares hijos de padres con mayor escolaridad (educación terciaria), los cuales presentan medias de cerca de 800 puntos.
+
+Como fuera mencionado anteriormente, solo en casos de interacción entre variables los gráficos de *simples slopes*, presentan rectas que no son paralelas y que potencialmente se cruzan.
+
 
 ```{r, echo = TRUE, eval = TRUE, warning=FALSE}
 #| code-fold: true
-#| fig-cap: "Escenario 1: figura sin efectos"
+#| fig-cap: "Escenario 4: interacción negativa"
 
 #---------------------------------------------------------------
 # simple slope
@@ -821,7 +848,9 @@ plot_4
 
 ```
 
-Finalmente, en el **escenario 5** incluimos un efecto de interacción. En este caso, es una interacción positiva que se espera que aumente las brechas observadas entre $y_{i}$ y $x_{i}$, condicional a los valores de $w_{i}$. En terminos sustantivos, los resultados de este escenario nos indican que la brecha en los puntajes de matematicas relativa a la escolaridad de los padres, es de mayor tamaño entre los estudiantes que asisten a escuelas privadas, en contraste a los estudiantes que asisten a escuelas públicas.
+Finalmente, en el **escenario 5** incluimos un efecto de interacción. En este caso, es una interacción positiva que se espera que aumente las brechas observadas entre $y_{i}$ y $x_{i}$, condicional a los valores de $w_{i}$. 
+
+En términos sustantivos, los resultados de este escenario nos indican que la brecha en los puntajes de matemáticas relativa a la escolaridad de los padres, es de mayor tamaño entre los estudiantes que asisten a escuelas privadas, en contraste a los estudiantes que asisten a escuelas públicas.
 
 Los gráficos de *simple slope*, para este tipo de escenarios muestran rectas que se cruzan, y que se *abren* a medida que aumentan los valores de $x_{i}$.
 
@@ -873,20 +902,24 @@ plot_5
 
 ```
 
-## Estimados de los escenarios generados
+## Estimados de regresión
 
-A continuación vamos a ajustar modelos de regresión sobre los datos generados que constituyen a los escenarios 1 a 5. Como los datos simulados solo incluyen a una realización del modelo o mecanismo generador de datos, los resultados obtenidos van a ser muy parecidos a los modelos definidos, pero no exactamente iguales. Estos ejericio nos servirá para ilustrar como los términos del modelo de regresión anterior se vinculan con las medias esperadas que fueron graficas con las figuras anteriores.
+A continuación vamos a ajustar modelos de regresión sobre los datos generados empleados en los escenarios 1 a 5. Como los datos sobre los que ajustaremos los modelos son datos simulados, de una sola realización del modelo definido o mecanismos generador datos, los resultados obtenidos van a ser muy parecidos a los parámetros definidos; pero no exactamente iguales.
+
+Esta diferencia entre el **parámetro** del modelo y el **estimado** del modelo suele simbolizarse mediante acentos en la notación. Por ejemplo el parámetro que expresa a la relación entre $y_{i}$ e $x_{i}$ es $\beta_{1}$, mientras que el estimado de esta relación es $\hat{\beta}_{1}$.
+
+El siguiente ejercicio nos servirá para ilustrar como serían los modelos de regresión que se pueden ajustar sobre los datos que generan a las figuras de los 5 escenarios anteriores.
+
 
 ```{r, echo = TRUE, eval = TRUE, warning=FALSE}
 #| code-fold: true
-#| fig-cap: "some text here"
 
 #---------------------------------------------------------------
-# figure
+# regression
 #---------------------------------------------------------------
 
 #--------------------------------------
-# ideal effects
+# fit models
 #--------------------------------------
 
 m01 <- lm(y ~ 1 + x + w + x*w, data = data_example_1)
@@ -896,7 +929,7 @@ m04 <- lm(y ~ 1 + x + w + x*w, data = data_example_4)
 m05 <- lm(y ~ 1 + x + w + x*w, data = data_example_5)
 
 #--------------------------------------
-# ideal effects
+# estimates
 #--------------------------------------
 
 texreg::screenreg(list(m01, m02, m03, m04, m05), 
@@ -916,19 +949,19 @@ La idea general es que con la ecuación de regresión anterior podemos producir 
 
 - Media de estudiantes con padres de escolaridad menor a terciaria, que asisten a escuelas públicas
 
-$E(\bar{y} | x_{i} = 0, w_{i} = 0) = \beta_{0} + \beta_{1}*0 + \beta_{2}*0 + \beta_{3}*0*0$
+$$E(\bar{y} | x_{i} = 0, w_{i} = 0) = \beta_{0} + \beta_{1}*0 + \beta_{2}*0 + \beta_{3}*0*0$$
 
 - Media de estudiantes con padres de escolaridad menor a terciaria, que asisten a escuelas privadas
 
-$E(\bar{y} | x_{i} = 0, w_{i} = 1) = \beta_{0} + \beta_{1}*0 + \beta_{2}*1 + \beta_{3}*0*1$
+$$E(\bar{y} | x_{i} = 0, w_{i} = 1) = \beta_{0} + \beta_{1}*0 + \beta_{2}*1 + \beta_{3}*0*1$$
 
 - Media de estudiantes con padres de escolaridad terciaria, que asisten a escuelas públicas
 
-$E(\bar{y} | x_{i} = 1, w_{i} = 0) = \beta_{0} + \beta_{1}*1 + \beta_{2}*0 + \beta_{3}*1*0$
+$$E(\bar{y} | x_{i} = 1, w_{i} = 0) = \beta_{0} + \beta_{1}*1 + \beta_{2}*0 + \beta_{3}*1*0$$
 
 - Media de estudiantes con padres de escolaridad terciaria, que asisten a escuelas privadas
 
-$E(\bar{y} | x_{i} = 1, w_{i} = 1) = \beta_{0} + \beta_{1}*1 + \beta_{2}*1 + \beta_{3}*1*1$
+$$E(\bar{y} | x_{i} = 1, w_{i} = 1) = \beta_{0} + \beta_{1}*1 + \beta_{2}*1 + \beta_{3}*1*1$$
 
 
 
@@ -977,6 +1010,18 @@ $E(\bar{y} | x_{i} = 1, w_{i} = 1) = \beta_{0} + \beta_{1}*1 + \beta_{2}*1 + \be
 
 ## Interacciones en modelos generalizados
 
+# Referencias
+
+Rabe-Hesketh, S., & Skrondal, A. (2012). Multilevel and Longitudinal Modeling Using Stata, Volumes I and II, Third Edition (3rd ed.). Stata Press.
+
+LeBeau, B. (2024). simglm: Simulate Models Based on the Generalized Linear Model. R package version 0.9.20, https://github.com/lebebr01/simglm.
+
+Bauer, D. J., & Curran, P. J. (2005). Probing Interactions in Fixed and Multilevel Regression: Inferential and Graphical Techniques. Multivariate Behavioral Research, 40(3), 373–400. https://doi.org/10.1207/s15327906mbr4003_5
+
+
+Preacher, K. J., Curran, P. J., & Bauer, D. J. (2006). Computational Tools for Probing Interactions in Multiple Linear Regression, Multilevel Modeling, and Latent Curve Analysis. Journal of Educational and Behavioral Statistics, 31(3), 437–448. https://doi.org/10.3102/10769986031004437
+
+
 # Bibliografía anotada
 
 Jaccard, J., Wan, C. K., & Turrisi, R. (1990). The Detection and Interpretation of Interaction Effects Between Continuous Variables in Multiple Regression. Multivariate Behavioral Research, 25(October), 467–478. https://doi.org/10.1207/s15327906mbr2504
@@ -995,7 +1040,7 @@ Sun, R., & Willson, V. L. (2009). Evaluating intercept-slope interactions in lat
 
 Baranger, D. A. A., Finsaas, M. C., Goldstein, B. L., Vize, C. E., Lynam, D. R., & Olino, T. M. (2023). Tutorial: Power Analyses for Interaction Effects in Cross-Sectional Regressions. Advances in Methods and Practices in Psychological Science, 6(3). https://doi.org/10.1177/25152459231187531
 
-Bauer, D. J., & Curran, P. J. (2005). Probing Interactions in Fixed and Multilevel Regression: Inferential and Graphical Techniques. Multivariate Behavioral Research, 40(3), 373–400. https://doi.org/10.1207/s15327906mbr4003_5
+Bauer, D. J., & Curran, P. J. (2005). Probing Interactions in Fixed and Multilevel Regression: Inferential and Graphical Techniques. Multivariate Behavioral Research, 40(3), 373–400. https://doi.org/10.1207/s15327906mbr4003\_5
 
 León, O. G., & Montero, I. (2001). Cómo explicar el concepto de interacción sin estadística: Análisis gráfico de todos los casos posibles en un diseño 2 x 2. Psicothema, 13(1), 159–165.
 
@@ -1120,7 +1165,7 @@ lavaan::summary(m01,
   rsquare=TRUE)
 
 
-```   
+```
 
 
 
@@ -1159,11 +1204,11 @@ Con los resultados de un modelo de regresión como el anterior podemos obtener l
 
 - Media de estudiantes con padres de escolaridad menor a terciaria
 
-$\beta_{0} + \beta_{1}(x_{i} = 0)$
+$$\beta_{0} + \beta_{1}(x_{i} = 0)$$
 
 - Media de estudiantes con padres de escolaridad terciaria
 
-$\beta_{0} + \beta_{1}(x_{i} = 1)$
+$$\beta_{0} + \beta_{1}(x_{i} = 1)$$
 
 **¿Que pasaría sin incluimos una tercera variable?** Si tuvieramos la información de una tercera variable, dado que estamos pensando el modelo de regresión como una forma de expresar medias condicionadas, es que entonces podriamos tener otra diferencia adicional entre grupos. Pensemos en una tercera covariable como la dependencia de la escuelas (e.g., Privadas y Públicas). Para efectos del ejemplo, pensemos que las escuelas privadas toman un valor uno, y las escuelas públicas toman un valor cero.
 
