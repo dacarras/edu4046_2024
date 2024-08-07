@@ -17,7 +17,7 @@ format:
     embed-resources: true
     grid:
       sidebar-width: 250px
-      body-width: 1050px # 950px for thinner width
+      body-width: 750px # 950px thinner, 1050px wider
       margin-width: 400px
       gutter-width: 1.5rem
     header-includes: |
@@ -28,10 +28,34 @@ monofontoptions:
   - Scale = 0.75
 ---
 
+# Introdución
+
+Cuando estudiamos las relaciones de covariables con respecto a una variable de respuesta existe un escenario particular, donde las relaciones pueden no ser constantes. Es decir, que la relación de de una covariable con respecto a la variable de respuesta, puede aumentar, o disminuir con respecto a una tercera variable.
+
+En edcuación, existen diversas aplicaciones, donde este escenario es de interés:
+
+- a) podemos estar interesados en buscar factores protectores para la brecha socioeconómica de los resultados académicos de los estudiantes.
+
+- b) podemos estar evaluando el efecto de un programa de intervención, y tener dudas razonables respecto a si el programa es efectivo para todos los estudiantes.
+
+- c) podemos estar estudiando cómo funciona una práctica escolar, y podríamos querer saber si opera de forma compensatoria con respecto a los estudiantes más vulnerables.
+
+- d) podemos estar estudiando cómo funciona una práctica escolar, y podríamos querer evaluar si es igual de beneficiosa para estudiantes hombres y mujeres.
+
+- e) podríamos estar interesados en si la introducción de incentivos salariales para profesores en escuelas vulnerables fomenta la retencion en estas escuelas de modo que se asemejen más al promedio.
+
+En todos los ejemplos anteriores podemos separar nuestras expectativas de resultados en al menos dos elementos:
+
+- a) tenemos una relacion principal entre dos variables (la variable de respuesta, y una covariable)
+- b) queremos ver si esta relación principal cambia segun un tercer factor
+
+
+Una herramienta que nos sirve para estudiar si la relación entre dos variable *cambia* en relación a un tercer factor son las **interacciones** entre variables. Esta herramienta nos permite evaluar si una relación de interés entre dos variables, es constante o no, a los valores de una tercera variable. Este tipo de modelos es muy común en el estudio de efectividad escolar, en el estudio de evaluación de programas, y en el estudio general de inequidad escolar.
+
 
 # Idea general
 
-Los modelos de regresión los podemos pensar como modelos de medias condicionadas. 
+Los modelos de regresión los podemos pensar como modelos de medias condicionadas. En terminos graficos, nos tenemos que imaginar que tenemos una media y condicional a los valores de otros atributos la media de la variable de respuesta puede tomar diferentes posiciones.
 
 Supongamos que tenemos los puntajes de un test que expresa habilidad matemática (e.g., capacidad de resolución de problemas), y denominemos a este puntaje como $y_{i}$. Que un modelo de regresión sea pensado como un modelo de medias condicionadas, nos permite indicar que podemos expresar diferentes puntos de del puntaje total anterior, segun los valores de otras covariables (i.e., *condicional a...*). Por ejemplo, que contamos con la escolaridad de los padres de los estudiantes, para los cuales tenemos los puntajes de habilidad. Empleemos a la variable $x_{i}$ para alojar a los valores de escolaridad de los padres (e.g., 1 para educación terciaria, y 0 para grados educativos menores a la educación terciaria.).
 
