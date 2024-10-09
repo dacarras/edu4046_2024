@@ -154,10 +154,20 @@ mutate(dependencia = case_when(
 w == 1 ~ 'Privada',
 w == 0 ~ 'Pública'
 )) %>%
+mutate(dependencia = factor(dependencia, 
+  levels = c(
+    'Pública',
+    'Privada'
+    ))) %>%
 mutate(escolaridad = case_when(
 x == 1 ~ 'Terciaria',
 x == 0 ~ 'No terciaria'
 )) %>%
+mutate(escolaridad = factor(escolaridad, 
+  levels = c(
+    'No terciaria',
+    'Terciaria'
+    ))) %>%
 ggplot(., 
   aes(
     y = y,
@@ -173,8 +183,8 @@ theme_ipsum() +
 ylab('Matemáticas') +
 scale_fill_manual(
 values = c(
-'Privada' = 'black',
-'Pública' = 'red'
+'Pública' = 'black',
+'Privada' = 'red'
 ))
 
 
@@ -1099,6 +1109,8 @@ knitr::kable()
 
 data_a6 %>%
 dplyr::filter(COUNTRY == 'COL') %>%
+mutate(id_k = 1) %>%
+mutate(id_j = IDSCHOOL) %>%
 mutate(y = MAT_1) %>%
 mutate(x = EDU) %>%
 mutate(w = case_when(
@@ -1108,6 +1120,91 @@ DEP == 3 ~ 0  # other
 )) %>%
 lm(y ~ 1 + x*w, data = .) %>%
 summary()
+
+
+data_a6 %>%
+dplyr::filter(COUNTRY == 'COL') %>%
+mutate(id_k = 1) %>%
+mutate(id_j = IDSCHOOL) %>%
+mutate(y = MAT_1) %>%
+mutate(x = EDU) %>%
+mutate(w = case_when(
+DEP == 1 ~ 0, # public
+DEP == 2 ~ 1, # private
+DEP == 3 ~ 0  # other
+)) %>%
+r4sda::center_variables(data = ., variable = x , name = x) %>%
+r4sda::center_variables(data = ., variable = w , name = w) %>%
+lmerTest::lmer(y ~ 1 + x_w*w_b + x_b*w_b + (1 + x_w | id_j), data = ., REML = FALSE) %>%
+summary()
+
+
+data_model <- data_a6 %>%
+dplyr::filter(COUNTRY == 'COL') %>%
+mutate(id_k = 1) %>%
+mutate(id_j = IDSCHOOL) %>%
+mutate(y = MAT_1) %>%
+mutate(x = EDU) %>%
+mutate(w = case_when(
+DEP == 1 ~ 0, # public
+DEP == 2 ~ 1, # private
+DEP == 3 ~ 0  # other
+)) %>%
+r4sda::center_variables(data = ., variable = x , name = x) %>%
+r4sda::center_variables(data = ., variable = w , name = w)
+
+f00 <- as.formula('y ~ 1 + x_w + (1 | id_j)')
+f01 <- as.formula('y ~ 1 + x_w + (1 + x_w | id_j)')
+f02 <- as.formula('y ~ 1 + x_w + x_b + w_b + (1 | id_j)')
+f03 <- as.formula('y ~ 1 + x_w + x_b + w_b + x_w:w_b + x_b:w_b + (1 + x_w | id_j)')
+
+# ----------------------------------------------- 
+# fit models
+# -----------------------------------------------
+
+m00 <- lme4::lmer(f00, data = data_model, REML = FALSE)
+m01 <- lme4::lmer(f01, data = data_model, REML = FALSE)
+m02 <- lme4::lmer(f02, data = data_model, REML = FALSE)
+m03 <- lme4::lmer(f03, data = data_model, REML = FALSE)
+
+
+texreg::screenreg(list(m00, m01, m02, m03), 
+  star.symbol = "*", 
+  center = TRUE, 
+  doctype = FALSE,
+  dcolumn = TRUE, 
+  booktabs = TRUE,
+  single.row = FALSE)
+
+
+# ----------------------------------------------- 
+# lrt mixture
+# -----------------------------------------------
+
+specify_decimal <- function(x, k) format(round(x, k), nsmall=k)
+
+lrt_mixture <- function(model_0, model_1){
+
+lrt    <- as.numeric(
+          lmtest::lrtest(model_0,model_1)$Chisq[2])
+
+pval   <- .5*pchisq(lrt, df=1, lower.tail=FALSE) + 
+          .5*pchisq(lrt, df=2, lower.tail=FALSE)
+
+result <- paste0("LRT_mixture = ",
+          specify_decimal(lrt,2),
+          ", pval = ",
+          specify_decimal(pval,2))
+
+return(result)
+}
+
+# ----------------------------------------------- 
+# lrt mixture results
+# -----------------------------------------------
+
+lrt_mixture(m00, m01)
+
 
 
 #--------------------------------------
