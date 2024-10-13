@@ -744,7 +744,7 @@ A continuación vamos a revisar las líneas adicionales de la salida de una regr
 
 3. Al igual que en el modelo nulo, esta línea nos reporta el total de la devianza del modelo nulo. Este número es la suma de todas las devianzas asociadas a cada valor observado, donde se solo se emplea al intercepto del modelo como información.
 
-4. Esta línea nos entrega la suma de las devianza de todas las observaciones luego de que emplearamos la infmoración del modelo ajustado, incluyendo al intercepto y a la pendiente asociada a la variable `poor`.
+4. Esta línea nos entrega la suma de las devianza de todas las observaciones luego de que emplearamos la información del modelo ajustado, incluyendo al intercepto y a la pendiente asociada a la variable `poor`.
 
 ## Agregando los odds ratio
 
@@ -1656,5 +1656,22 @@ glm(dropout ~ ZACH + zses + int,
 broom::tidy()  %>%                                                  
 mutate(odds_ratio = exp(estimate))  %>%                             
 knitr::kable(., digits = 3)                                         
+
+```
+
+## Anexo 2: Likelihood Ratio Test
+
+```{r, echo = TRUE, eval = TRUE}
+
+# secuencia de modelos
+
+# modelo nulo
+m00 <- glm(dropout ~ 1, data = data_nels, family = "binomial")
+
+# modelo nulo
+m01 <- glm(dropout ~ 1 + poor, data = data_nels, family = "binomial")
+
+# Likelihood ratio test
+lmtest::lrtest(m00, m01)
 
 ```
