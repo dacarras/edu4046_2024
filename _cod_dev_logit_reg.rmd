@@ -1674,6 +1674,4 @@ m01 <- glm(dropout ~ 1 + poor, data = data_nels, family = "binomial")
 # Likelihood ratio test
 lmtest::lrtest(m00, m01)
 
-lr.test(m00, m01)
-
 ```

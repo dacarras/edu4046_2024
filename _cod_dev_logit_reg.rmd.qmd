@@ -1658,22 +1658,3 @@ mutate(odds_ratio = exp(estimate))  %>%
 knitr::kable(., digits = 3)                                         
 
 ```
-
-## Anexo 2: Likelihood Ratio Test
-
-```{r, echo = TRUE, eval = TRUE}
-
-# secuencia de modelos
-
-# modelo nulo
-m00 <- glm(dropout ~ 1, data = data_nels, family = "binomial")
-
-# modelo nulo
-m01 <- glm(dropout ~ 1 + poor, data = data_nels, family = "binomial")
-
-# Likelihood ratio test
-lmtest::lrtest(m00, m01)
-
-lr.test(m00, m01)
-
-```
