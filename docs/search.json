@@ -1125,5 +1125,54 @@
     "title": "Regresión logística en R",
     "section": "Anexo 3: Efectos marginales (Average Marginal Effects)",
     "text": "Anexo 3: Efectos marginales (Average Marginal Effects)\nComo fuera visto en clase podemos obtener los efectos marginales, en particular los average marginal effects. Estos nos entregan el cambio esperado en escala de probabilidad, por sobre el promedio, para cada unidad sobre cada covariable del mdoelo. Sin embargo, en esta guía empleamos probabilidades condicionales esperadas a valores particulares para ilustrar los resultados esperados, siguiendo a Osborne (2012).\n\n# efectos marginales (average marginal effects)\nmarginaleffects::avg_slopes(m04)\n\n\n Term Estimate Std. Error      z Pr(&gt;|z|)     S   2.5 %   97.5 %\n int   -0.0148    0.00367  -4.04   &lt;0.001  14.2 -0.0220 -0.00763\n zach  -0.0832    0.00401 -20.76   &lt;0.001 315.6 -0.0911 -0.07535\n zses  -0.0607    0.00391 -15.53   &lt;0.001 178.4 -0.0684 -0.05305\n\nColumns: term, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high \nType:  response \n\n\nPara más detalles de que son estas probabilidades condicionales, y como se obvtienen se recomienda consultar Heiss (2018)."
+  },
+  {
+    "objectID": "cfa_as_mlm.html",
+    "href": "cfa_as_mlm.html",
+    "title": "CFA como modelo mixto",
+    "section": "",
+    "text": "Simulamos datos multinivel con componentes de varianza de \\(\\sigma^2_{w} = .1\\) y \\(\\sigma^2_{b} = .9\\), y con media cero. Generamos datos para 500 clusters, con 5 observaciones para cada cluster, dando un total de 25000 observaciones. Estos datos, se pueden bajar del siguiente link.\nCada cluster lo simbolizamos con la letra j, y a cada observación con la letra i.\nLos datos generados se encuentran en formato stacked o long, donde cada fila es una observación, indexada en un cluster. Estos datos los volteamos, para producir una representación de las mismas observaciones en formato wide o hacia el lado. En este caso, se emplean 5 columnas (i1-i5) para alojar los valores de cada observación por cada cluter j.\nEmpleando a la libreria lavaan, ilustramos como ajustar un modelo MLM sobre los datos en stacked, y ajustamos un modelo CFA sobre los datos en wide, recuperando los mismos resultados en cada caso, hasta a dos decimales."
+  },
+  {
+    "objectID": "cfa_as_mlm.html#modelo-mlm-tradicional",
+    "href": "cfa_as_mlm.html#modelo-mlm-tradicional",
+    "title": "CFA como modelo mixto",
+    "section": "3.1 Modelo MLM tradicional",
+    "text": "3.1 Modelo MLM tradicional\nEmpleamos la función lme4::lmer() para ajustar un modelo multinivel de tipo nulo, sobre los datos data_long.rds.\n\n# ----------------------------------------------- \n# method 1: lem4::lmer()\n# -----------------------------------------------\n\nfit_null &lt;- lme4::lmer(y ~ 1 + (1|id_j), data = data_long, REML = FALSE)\nsummary(fit_null)\n\nLinear mixed model fit by maximum likelihood  ['lmerMod']\nFormula: y ~ 1 + (1 | id_j)\n   Data: data_long\n\n     AIC      BIC   logLik deviance df.resid \n  3315.2   3332.6  -1654.6   3309.2     2497 \n\nScaled residuals: \n    Min      1Q  Median      3Q     Max \n-3.0237 -0.6097 -0.0063  0.6006  3.7461 \n\nRandom effects:\n Groups   Name        Variance Std.Dev.\n id_j     (Intercept) 0.9564   0.9780  \n Residual             0.1013   0.3183  \nNumber of obs: 2500, groups:  id_j, 500\n\nFixed effects:\n            Estimate Std. Error t value\n(Intercept) 0.006864   0.044196   0.155"
+  },
+  {
+    "objectID": "cfa_as_mlm.html#modelo-mlm-en-lavaan",
+    "href": "cfa_as_mlm.html#modelo-mlm-en-lavaan",
+    "title": "CFA como modelo mixto",
+    "section": "3.2 Modelo MLM en lavaan",
+    "text": "3.2 Modelo MLM en lavaan\nEmpleamos la función lavaan::sem() para ajustar un modelo multinivel de tipo nulo, sobre los datos data_long.rds.\n\n# ----------------------------------------------- \n# method 2: lavaan::sem()\n# -----------------------------------------------\n\nlavaan_mlm &lt;- '\nlevel: 1\n# variance w\ny~~w*y\n\nlevel: 2\n# variance b\ny~~b*y\n\ny~mu*1\n\n# model terms\ny00   := mu\nvar_w := w\nvar_b := b\nicc   := b/(b+w)\n\n'\n\nfit_mlm &lt;- lavaan::sem(model = lavaan_mlm, \n           data = data_long, \n           cluster = \"id_j\"\n           )\n\nsummary(fit_mlm)\n\nLength  Class   Mode \n     1 lavaan     S4 \n\nlavaan::parameterEstimates(fit_mlm) %&gt;%\ndplyr::filter(op == ':=') %&gt;%\ndplyr::filter(label %in% c('y00','var_w','var_b','icc')) %&gt;%\ndplyr::select(label, est, se) %&gt;%\nknitr::kable(., digits = 3)\n\n\n\nlabel\nest\nse\n\n\n\ny00\n0.007\n0.044\n\n\nvar_w\n0.101\n0.003\n\n\nvar_b\n0.956\n0.062\n\n\nicc\n0.904\n0.006"
+  },
+  {
+    "objectID": "cfa_as_mlm.html#modelo-mlm-por-medio-de-un-modelo-cfa",
+    "href": "cfa_as_mlm.html#modelo-mlm-por-medio-de-un-modelo-cfa",
+    "title": "CFA como modelo mixto",
+    "section": "3.2 Modelo MLM por medio de un modelo CFA",
+    "text": "3.2 Modelo MLM por medio de un modelo CFA\nEmpleamos la función lavaan::sem() para ajustar un modelo multinivel de tipo nulo a través de un modelo CFA, sobre los datos data_wide.\n\n# ----------------------------------------------- \n# method 3: lavaan::sem()\n# -----------------------------------------------\n\nlavaan_cfa &lt;- '\n# random term\neta =~ 1*i1 \neta =~ 1*i2 \neta =~ 1*i3 \neta =~ 1*i4 \neta =~ 1*i5 \n\n# latent mean\neta ~ mu*1\n\n# person intercepts\ni1  ~ d1 *1\ni2  ~ d2 *1\ni3  ~ d3 *1\ni4  ~ d4 *1\ni5  ~ d5 *1\n\n# variance\neta~~b*eta\n\n# residual variance\ni1 ~~ w*i1\ni2 ~~ w*i2\ni3 ~~ w*i3\ni4 ~~ w*i4\ni5 ~~ w*i5\n\n# model constraints\n\ncw := (d1 +d2 +d3 +d4 +d5)/5\n\ncw == 0\n\n# model terms\ny00   := mu\nvar_w := w\nvar_b := b\nicc   := b/(b+w)\n\n\n'\n\nfit_cfa &lt;- lavaan::sem(model = lavaan_cfa, \n           data = data_wide\n           )\n\nsummary(fit_cfa)\n\nLength  Class   Mode \n     1 lavaan     S4 \n\nlavaan::parameterEstimates(fit_cfa) %&gt;%\ndplyr::filter(op == ':=') %&gt;%\ndplyr::filter(label %in% c('y00','var_w','var_b','icc')) %&gt;%\ndplyr::select(label, est, se) %&gt;%\nknitr::kable(., digits = 3)\n\n\n\nlabel\nest\nse\n\n\n\ny00\n0.007\n0.044\n\n\nvar_w\n0.101\n0.003\n\n\nvar_b\n0.956\n0.062\n\n\nicc\n0.905\n0.006"
+  },
+  {
+    "objectID": "cfa_as_mlm.html#extraer-los-estimados-de-cada-modelo-ajustado",
+    "href": "cfa_as_mlm.html#extraer-los-estimados-de-cada-modelo-ajustado",
+    "title": "CFA como modelo mixto",
+    "section": "4.1 Extraer los estimados de cada modelo ajustado",
+    "text": "4.1 Extraer los estimados de cada modelo ajustado\n\n# ----------------------------------------------- \n# retrive estimates\n# -----------------------------------------------\n\n# function to adjust to two decimal places\ndecimal &lt;- function (x, k) {\n    format(round(x, k), nsmall = k)\n}\n\n# lmer4::lmer()\ntable_est_1 &lt;- broom.mixed::tidy(fit_null) %&gt;%\nmutate(label = c('y00','var_b', 'var_w')) %&gt;%\nmutate(est = case_when(\neffect == 'fixed'    ~ estimate,\neffect == 'ran_pars' ~ estimate*estimate\n)) %&gt;%\nmutate(est_1_se = paste0(decimal(est, 2), ' (', decimal(std.error,2), ')')) %&gt;%\ndplyr::select(label, est_1_se)\n\n# lavaan mlm\ntable_est_2 &lt;- lavaan::parameterEstimates(fit_mlm) %&gt;%\ndplyr::filter(op == ':=') %&gt;%\ndplyr::filter(label %in% c('y00','var_w','var_b','icc')) %&gt;%\nmutate(est_2_se = paste0(decimal(est, 2), ' (', decimal(se,2), ')')) %&gt;%\ndplyr::select(label, est_2_se) \n\n# lavaan cfa\ntable_est_3 &lt;- lavaan::parameterEstimates(fit_cfa) %&gt;%\ndplyr::filter(op == ':=') %&gt;%\ndplyr::filter(label %in% c('y00','var_w','var_b','icc')) %&gt;%\nmutate(est_3_se = paste0(decimal(est, 2), ' (', decimal(se,2), ')')) %&gt;%\ndplyr::select(label, est_3_se)"
+  },
+  {
+    "objectID": "cfa_as_mlm.html#tabla-comparada",
+    "href": "cfa_as_mlm.html#tabla-comparada",
+    "title": "CFA como modelo mixto",
+    "section": "4.2 Tabla comparada",
+    "text": "4.2 Tabla comparada\n\n# ----------------------------------------------- \n# display table comparison\n# -----------------------------------------------\n\ndplyr::full_join(table_est_1, table_est_2, by = 'label') %&gt;%\ndplyr::full_join(., table_est_3, by = 'label') %&gt;%\nrename(\n`lme4::lmer()` = 2,\n`lavaan::sem()-MLM` = 3,\n`lavaan::sem()-CFA` = 4\n) %&gt;%\nknitr::kable()\n\n\n\nlabel\nlme4::lmer()\nlavaan::sem()-MLM\nlavaan::sem()-CFA\n\n\n\ny00\n0.01 (0.04)\n0.01 (0.04)\n0.01 (0.04)\n\n\nvar_b\n0.96 ( NA)\n0.96 (0.06)\n0.96 (0.06)\n\n\nvar_w\n0.10 ( NA)\n0.10 (0.00)\n0.10 (0.00)\n\n\nicc\n\n0.90 (0.01)\n0.90 (0.01)"
+  },
+  {
+    "objectID": "cfa_as_mlm.html#código-mplus-para-generar-los-datos-simulados",
+    "href": "cfa_as_mlm.html#código-mplus-para-generar-los-datos-simulados",
+    "title": "CFA como modelo mixto",
+    "section": "Código Mplus para generar los datos simulados",
+    "text": "Código Mplus para generar los datos simulados\nTITLE:\nnull mlm;\n\nMONTECARLO:\n \nNAMES         = y;       \nNOBSERVATIONS = 2500;    \nNCSIZES       = 1;       \nCSIZES        = 500 (5); \nNREPS         = 1;       \nSEED          = 4046;    \nSAVE          = icc_90.dat;\n\nMODEL POPULATION:\n \n%WITHIN%                 \n!residual variance       \ny*0.1;\n\n%BETWEEN%               \n!latent mean            \n[y@0];                  \ny*0.9;\n\nANALYSIS:\n\nTYPE = TWOLEVEL;\nESTIMATOR = ML;\n\nMODEL:\n \n%WITHIN%                 \n!residual variance       \ny*0.1;\n\n%BETWEEN%               \n!latent mean            \n[y@0];                  \ny*0.9;\n\nOUTPUT:\nTECH9;"
   }
 ]
